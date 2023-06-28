@@ -13,7 +13,7 @@ build:
   # it may be that one can patch out the requirements to get the command
   # vulkaninfo to work correctly
   skip: true  # [osx]
-  number: 0
+  number: 1
 
 requirements:
   build:
