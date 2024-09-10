@@ -1,4 +1,4 @@
-{% set version = "1.3.250" %}
+{% set version = "1.3.290" %}
 
 package:
   name: vulkan-tools
@@ -13,7 +13,7 @@ build:
   # it may be that one can patch out the requirements to get the command
   # vulkaninfo to work correctly
   skip: true  # [osx]
-  number: 2
+  number: 0
 
 requirements:
   build:
