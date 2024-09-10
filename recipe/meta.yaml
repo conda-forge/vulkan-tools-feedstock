@@ -6,7 +6,7 @@ package:
 
 source:
   url: https://github.com/KhronosGroup/Vulkan-Tools/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: a1cd4f7d8d58bec26efb1e5ea73f82dcf36a9662d55401b81a783071b211a35a
+  sha256: e07c900f770a8bb596ee5c5ba427eab473ec3bc6b70df2554ebce8a51d1b282a
 
 build:
   # osx requires MotlenVK which we do not package at conda-forge (yet?)
