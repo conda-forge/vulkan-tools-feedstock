@@ -28,7 +28,7 @@ requirements:
   host:
     - libvulkan-headers  {{ version }}
     - libvulkan-loader   {{ version }}
-    - volk
+    - volk-dev
     - wayland              # [linux]
     - wayland-protocols    # [linux]
     - xorg-libx11          # [linux]
@@ -41,7 +41,6 @@ test:
   commands:
     - which vulkaninfo   # [unix]
     - where vulkaninfo   # [win]
-    
 
 about:
   home: https://github.com/KhronosGroup/Vulkan-Tools/
