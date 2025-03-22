@@ -1,4 +1,4 @@
-{% set version = "1.3.290" %}
+{% set version = "1.4.311" %}
 
 package:
   name: vulkan-tools
@@ -6,7 +6,7 @@ package:
 
 source:
   url: https://github.com/KhronosGroup/Vulkan-Tools/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: e07c900f770a8bb596ee5c5ba427eab473ec3bc6b70df2554ebce8a51d1b282a
+  sha256: 7113bc0c746b45072e269fada0d684b4ae9de609c38d9e764b59793b14120a7b
 
 build:
   # osx requires MotlenVK which we do not package at conda-forge (yet?)
