@@ -54,4 +54,5 @@ extra:
   recipe-maintainers:
     - JarrettSJohnson
     - hmaarrfk
+    # eunos-1128 is interested in aarch64 and ppc64le
     - eunos-1128
