@@ -1,10 +1,7 @@
-set -ex
-mkdir -p build
-cd build
+#!/bin/bash
 
-cmake ${CMAKE_ARGS} \
-    -DCMAKE_INSTALL_PREFIX=${PREFIX} \
-    ..
+set -exo pipefail
 
-make -j${CPU_COUNT}
-make install
+cmake -S . -B build ${CMAKE_ARGS} -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release --parallel ${CPU_COUNT}
+cmake --install build
