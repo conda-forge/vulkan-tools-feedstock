@@ -1,5 +1,5 @@
 diff --git a/cube/CMakeLists.txt b/cube/CMakeLists.txt
-index 4ecd3e36..2ee9e1ac 100644
+index 4ecd3e36..16aea8c8 100644
 --- a/cube/CMakeLists.txt
 +++ b/cube/CMakeLists.txt
 @@ -106,47 +106,47 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux|BSD|GNU")
@@ -129,7 +129,7 @@ index 4ecd3e36..2ee9e1ac 100644
  endif()
  if (X11_LINK_LIBRARIES)
 -    target_compile_definitions(vkcubepp PUBLIC "XLIB_LIBRARY=\"${X11_LINK_LIBRARIES}\"")
-+    target_compile_definitions(vkcubepp PUBLIC "XLIB_LIBRARY=\"\\\"\"\\\"${X11_LINK_LIBRARIES}\\\"\"")
++    target_compile_definitions(vkcubepp PUBLIC "XLIB_LIBRARY=\"\\\"${X11_LINK_LIBRARIES}\\\"\"")
  endif()
  if (WAYLAND_CLIENT_LINK_LIBRARIES)
 -    target_compile_definitions(vkcubepp PUBLIC "WAYLAND_LIBRARY=\"${WAYLAND_CLIENT_LINK_LIBRARIES}\"")
