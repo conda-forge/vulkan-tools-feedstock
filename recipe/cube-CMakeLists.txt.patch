@@ -1,5 +1,5 @@
 diff --git a/cube/CMakeLists.txt b/cube/CMakeLists.txt
-index 4ecd3e36..130d1748 100644
+index 4ecd3e36..4bbe9629 100644
 --- a/cube/CMakeLists.txt
 +++ b/cube/CMakeLists.txt
 @@ -106,47 +106,47 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux|BSD|GNU")
@@ -103,3 +103,37 @@ index 4ecd3e36..130d1748 100644
  endif()
  
  if(WIN32)
+@@ -306,13 +306,13 @@ if (ANDROID)
+ endif()
+ 
+ if (XCB_LINK_LIBRARIES)
+-    target_compile_definitions(vkcube PRIVATE "XCB_LIBRARY=\"${XCB_LINK_LIBRARIES}\"")
++    target_compile_definitions(vkcube PRIVATE "XCB_LIBRARY=${XCB_LINK_LIBRARIES}")
+ endif()
+ if (X11_LINK_LIBRARIES)
+-    target_compile_definitions(vkcube PRIVATE "XLIB_LIBRARY=\"${X11_LINK_LIBRARIES}\"")
++    target_compile_definitions(vkcube PRIVATE "XLIB_LIBRARY=${X11_LINK_LIBRARIES}")
+ endif()
+ if (WAYLAND_CLIENT_LINK_LIBRARIES)
+-    target_compile_definitions(vkcube PRIVATE "WAYLAND_LIBRARY=\"${WAYLAND_CLIENT_LINK_LIBRARIES}\"")
++    target_compile_definitions(vkcube PRIVATE "WAYLAND_LIBRARY=${WAYLAND_CLIENT_LINK_LIBRARIES}")
+ endif()
+ 
+ # ----------------------------------------------------------------------------
+@@ -359,13 +359,13 @@ target_compile_definitions(vkcubepp PRIVATE ${ENABLED_CUBE_PLATFORMS})
+ target_link_libraries(vkcubepp  Vulkan::Headers volk::volk_headers)
+ 
+ if (XCB_LINK_LIBRARIES )
+-    target_compile_definitions(vkcubepp PUBLIC "XCB_LIBRARY=\"${XCB_LINK_LIBRARIES}\"")
++    target_compile_definitions(vkcubepp PUBLIC "XCB_LIBRARY=${XCB_LINK_LIBRARIES}")
+ endif()
+ if (X11_LINK_LIBRARIES)
+-    target_compile_definitions(vkcubepp PUBLIC "XLIB_LIBRARY=\"${X11_LINK_LIBRARIES}\"")
++    target_compile_definitions(vkcubepp PUBLIC "XLIB_LIBRARY=${X11_LINK_LIBRARIES}")
+ endif()
+ if (WAYLAND_CLIENT_LINK_LIBRARIES)
+-    target_compile_definitions(vkcubepp PUBLIC "WAYLAND_LIBRARY=\"${WAYLAND_CLIENT_LINK_LIBRARIES}\"")
++    target_compile_definitions(vkcubepp PUBLIC "WAYLAND_LIBRARY=${WAYLAND_CLIENT_LINK_LIBRARIES}")
+ endif()
+ 
+ if(APPLE)
