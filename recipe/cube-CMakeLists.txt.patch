@@ -1,0 +1,22 @@
+diff --git a/cube/CMakeLists.txt b/cube/CMakeLists.txt
+index 4ecd3e36..e04afa47 100644
+--- a/cube/CMakeLists.txt
++++ b/cube/CMakeLists.txt
+@@ -106,12 +106,12 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux|BSD|GNU")
+ 
+         add_custom_command(COMMENT "Generating wayland client protocol dispatch data"
+                           OUTPUT wayland-client.c
+-                          COMMAND ${WAYLAND_SCANNER_EXECUTABLE}
++                          COMMAND "${WAYLAND_SCANNER_EXECUTABLE}"
+                                   private-code
+-                                  ${WAYLAND_CODE_PROTOCOL}
+-                                  ${CMAKE_CURRENT_BINARY_DIR}/wayland-client.c
+-                          MAIN_DEPENDENCY ${WAYLAND_CODE_PROTOCOL}
+-                          DEPENDS ${WAYLAND_CODE_PROTOCOL} ${WAYLAND_SCANNER_EXECUTABLE})
++                                  "${WAYLAND_CODE_PROTOCOL}"
++                                  "${CMAKE_CURRENT_BINARY_DIR}/wayland-client.c"
++                          MAIN_DEPENDENCY "${WAYLAND_CODE_PROTOCOL}"
++                          DEPENDS "${WAYLAND_CODE_PROTOCOL}" "${WAYLAND_SCANNER_EXECUTABLE}")
+ 
+         add_custom_command(COMMENT "Generating xdg-shell protocol dispatch data"
+                            OUTPUT xdg-shell-code.c
