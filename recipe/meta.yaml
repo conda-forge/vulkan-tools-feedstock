@@ -19,13 +19,13 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}
-    - {{ stdlib('c') }}
     - {{ compiler('cxx') }}
+    - {{ stdlib('c') }}
     - cmake
-    - pkg-config   # [unix]
+    - glslang
     - make         # [unix]
     - ninja        # [win]
-    - glslang
+    - pkg-config   # [unix]
   host:
     - libvulkan-headers  {{ version }}
     - libvulkan-loader   {{ version }}
