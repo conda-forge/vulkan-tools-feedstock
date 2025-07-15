@@ -1,10 +1,9 @@
-set -ex
+set -exo pipefail
+
 mkdir -p build
 cd build
 
-cmake ${CMAKE_ARGS} \
-    -DCMAKE_INSTALL_PREFIX=${PREFIX} \
-    ..
+cmake ${CMAKE_ARGS} ..
 
-make -j${CPU_COUNT}
+make VERBOSE=1 -j${CPU_COUNT}
 make install

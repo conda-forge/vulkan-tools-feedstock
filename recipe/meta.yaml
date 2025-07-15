@@ -7,24 +7,25 @@ package:
 source:
   url: https://github.com/KhronosGroup/Vulkan-Tools/archive/refs/tags/v{{ version }}.tar.gz
   sha256: fa17870f531affec06dfd5cab8121cb6e54777f779dab59fccafeb136fe43e19
+  patches: cube-CMakeLists.txt.patch
 
 build:
   # osx requires MotlenVK which we do not package at conda-forge (yet?)
   # it may be that one can patch out the requirements to get the command
   # vulkaninfo to work correctly
   skip: true  # [osx]
-  number: 0
+  number: 1
 
 requirements:
   build:
     - {{ compiler('c') }}
-    - {{ stdlib('c') }}
     - {{ compiler('cxx') }}
+    - {{ stdlib('c') }}
     - cmake
-    - pkg-config   # [unix]
+    - glslang
     - make         # [unix]
     - ninja        # [win]
-    - glslang
+    - pkg-config   # [unix]
   host:
     - libvulkan-headers  {{ version }}
     - libvulkan-loader   {{ version }}
@@ -54,3 +55,5 @@ extra:
   recipe-maintainers:
     - JarrettSJohnson
     - hmaarrfk
+    # eunos-1128 is interested in aarch64 and ppc64le
+    - eunos-1128
