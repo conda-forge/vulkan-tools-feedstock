@@ -1,11 +1,14 @@
-{% set version = "1.4.328" %}
+# For this repo, v**** tags exists, but apparently the stable tags (the one corresponding to versions
+# that are available for download at https://vulkan.lunarg.com/sdk/home) are the vulkan-sdk-*** ones
+# See https://github.com/KhronosGroup/Vulkan-Headers#version-tagging-scheme
+{% set version = "1.4.328.1" %}
 
 package:
   name: vulkan-tools
   version: {{ version }}
 
 source:
-  url: https://github.com/KhronosGroup/Vulkan-Tools/archive/refs/tags/v{{ version }}.tar.gz
+  url: https://github.com/KhronosGroup/Vulkan-Tools/archive/refs/tags/vulkan-sdk-{{ version }}.tar.gz
   sha256: 0022b8b393ce1fce2c7c18890f6ab7abf9521c3b5a00143c4a11233d51e7b945
 
 build:
