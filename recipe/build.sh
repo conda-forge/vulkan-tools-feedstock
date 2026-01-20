@@ -1,9 +1,5 @@
 set -exo pipefail
 
-mkdir -p build
-cd build
-
-cmake ${CMAKE_ARGS} ..
-
-make VERBOSE=1 -j${CPU_COUNT}
-make install
+cmake -S . -B build ${CMAKE_ARGS}
+cmake --build build --parallel ${CPU_COUNT}
+cmake --install build
