@@ -16,18 +16,18 @@ build:
   # it may be that one can patch out the requirements to get the command
   # vulkaninfo to work correctly
   skip: true  # [osx]
-  number: 0
+  number: 1
 
 requirements:
   build:
     - {{ compiler('c') }}
-    - {{ stdlib('c') }}
     - {{ compiler('cxx') }}
+    - {{ stdlib('c') }}
     - cmake
-    - pkg-config   # [unix]
+    - glslang
     - make         # [unix]
     - ninja        # [win]
-    - glslang
+    - pkg-config   # [unix]
   host:
     - libvulkan-headers  {{ version }}
     - libvulkan-loader   {{ version }}
@@ -58,3 +58,5 @@ extra:
     - traversaro
     - JarrettSJohnson
     - hmaarrfk
+    # eunos-1128 is interested in aarch64 and ppc64le
+    - eunos-1128
