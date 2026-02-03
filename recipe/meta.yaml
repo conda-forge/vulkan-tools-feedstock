@@ -10,12 +10,10 @@ package:
 source:
   url: https://github.com/KhronosGroup/Vulkan-Tools/archive/refs/tags/vulkan-sdk-{{ version }}.tar.gz
   sha256: dc65f1ea97dd0b2155c2281a79e87d27183c0737fb96377744091a3c8460ae1e
+  patches:
+    - use-system-icd.patch  # [osx]
 
 build:
-  # osx requires MotlenVK which we do not package at conda-forge (yet?)
-  # it may be that one can patch out the requirements to get the command
-  # vulkaninfo to work correctly
-  skip: true  # [osx]
   number: 0
 
 requirements:
