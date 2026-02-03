@@ -1,7 +1,7 @@
 # For this repo, v**** tags exists, but apparently the stable tags (the one corresponding to versions
 # that are available for download at https://vulkan.lunarg.com/sdk/home) are the vulkan-sdk-*** ones
 # See https://github.com/KhronosGroup/Vulkan-Headers#version-tagging-scheme
-{% set version = "1.4.335.0" %}
+{% set version = "1.4.341.0" %}
 
 package:
   name: vulkan-tools
@@ -9,7 +9,7 @@ package:
 
 source:
   url: https://github.com/KhronosGroup/Vulkan-Tools/archive/refs/tags/vulkan-sdk-{{ version }}.tar.gz
-  sha256: 85bf51a54271c87925711f7159ea66cc6c5abf6afd5f2bbf452d444fd7deccf3
+  sha256: dc65f1ea97dd0b2155c2281a79e87d27183c0737fb96377744091a3c8460ae1e
 
 build:
   # osx requires MotlenVK which we do not package at conda-forge (yet?)
