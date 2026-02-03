@@ -29,7 +29,6 @@ requirements:
   host:
     - libvulkan-headers  {{ version }}
     - libvulkan-loader   {{ version }}
-    - vulkan-volk
     - wayland              # [linux]
     - wayland-protocols    # [linux]
     - xorg-libx11          # [linux]
