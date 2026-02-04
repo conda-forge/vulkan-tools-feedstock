@@ -1,0 +1,228 @@
+diff --git a/cube/CMakeLists.txt b/cube/CMakeLists.txt
+index dac6bfe..aa91e7c 100644
+--- a/cube/CMakeLists.txt
++++ b/cube/CMakeLists.txt
+@@ -16,36 +16,42 @@
+ # ~~~
+ 
+ if(APPLE)
+-    set(MOLTENVK_REPO_ROOT "MOLTENVK-NOTFOUND" CACHE PATH "Absolute path to a MoltenVK repo directory")
+-    if(NOT MOLTENVK_REPO_ROOT)
+-        message(FATAL_ERROR "Must define location of MoltenVK repo -- see BUILD.md")
++    option(APPLE_USE_SYSTEM_ICD "Use system Vulkan ICD discovery instead of bundling MoltenVK" OFF)
++
++    if(APPLE_USE_SYSTEM_ICD)
++        message(STATUS "Using system Vulkan loader for ICD discovery")
++    else()
++        set(MOLTENVK_REPO_ROOT "MOLTENVK-NOTFOUND" CACHE PATH "Absolute path to a MoltenVK repo directory")
++        if(NOT MOLTENVK_REPO_ROOT)
++            message(FATAL_ERROR "Must define location of MoltenVK repo -- see BUILD.md")
++        endif()
++        message(STATUS "Using MoltenVK repo location at ${MOLTENVK_REPO_ROOT}")
++
++        # Source for the MoltenVK ICD library and JSON file
++        set(MOLTENVK_DIR ${MOLTENVK_REPO_ROOT})
++
++        # MoltenVK JSON File
++        execute_process(COMMAND mkdir -p ${PROJECT_BINARY_DIR}/staging-json)
++        execute_process(COMMAND sed -e "/\"library_path\":/s$:[[:space:]]*\"[[:space:]]*[\\.\\/]*$: \"..\\/..\\/..\\/Frameworks\\/$"
++                                ${MOLTENVK_DIR}/MoltenVK/icd/MoltenVK_icd.json
++                        OUTPUT_FILE ${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json)
++
++        # ~~~
++        # Modify the ICD JSON file to adjust the library path.
++        # The ICD JSON file goes in the Resources/vulkan/icd.d directory, so adjust the
++        # library_path to the relative path to the Frameworks directory in the bundle.
++        # The regex does: substitute ':<whitespace>"<whitespace><all occurences of . and />' with:
++        # ': "../../../Frameworks/'
++        # ~~~
++        add_custom_target(MoltenVK_icd-staging-json ALL
++            COMMAND mkdir -p ${PROJECT_BINARY_DIR}/staging-json
++            COMMAND sed -e "/\"library_path\":/s$:[[:space:]]*\"[[:space:]]*[\\.\\/]*$: \"..\\/..\\/..\\/Frameworks\\/$"
++                    ${MOLTENVK_DIR}/MoltenVK/icd/MoltenVK_icd.json > ${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json
++            VERBATIM
++            DEPENDS "${MOLTENVK_DIR}/MoltenVK/icd/MoltenVK_icd.json"
++        )
++        set_source_files_properties(${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json PROPERTIES GENERATED TRUE)
+     endif()
+-    message(STATUS "Using MoltenVK repo location at ${MOLTENVK_REPO_ROOT}")
+-
+-    # Source for the MoltenVK ICD library and JSON file
+-    set(MOLTENVK_DIR ${MOLTENVK_REPO_ROOT})
+-
+-    # MoltenVK JSON File
+-    execute_process(COMMAND mkdir -p ${PROJECT_BINARY_DIR}/staging-json)
+-    execute_process(COMMAND sed -e "/\"library_path\":/s$:[[:space:]]*\"[[:space:]]*[\\.\\/]*$: \"..\\/..\\/..\\/Frameworks\\/$"
+-                            ${MOLTENVK_DIR}/MoltenVK/icd/MoltenVK_icd.json
+-                    OUTPUT_FILE ${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json)
+-
+-    # ~~~
+-    # Modify the ICD JSON file to adjust the library path.
+-    # The ICD JSON file goes in the Resources/vulkan/icd.d directory, so adjust the
+-    # library_path to the relative path to the Frameworks directory in the bundle.
+-    # The regex does: substitute ':<whitespace>"<whitespace><all occurences of . and />' with:
+-    # ': "../../../Frameworks/'
+-    # ~~~
+-    add_custom_target(MoltenVK_icd-staging-json ALL
+-        COMMAND mkdir -p ${PROJECT_BINARY_DIR}/staging-json
+-        COMMAND sed -e "/\"library_path\":/s$:[[:space:]]*\"[[:space:]]*[\\.\\/]*$: \"..\\/..\\/..\\/Frameworks\\/$"
+-                ${MOLTENVK_DIR}/MoltenVK/icd/MoltenVK_icd.json > ${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json
+-        VERBATIM
+-        DEPENDS "${MOLTENVK_DIR}/MoltenVK/icd/MoltenVK_icd.json"
+-    )
+-    set_source_files_properties(${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json PROPERTIES GENERATED TRUE)
+ 
+     find_library(COCOA NAMES Cocoa)
+ 
+@@ -290,12 +296,7 @@ target_link_libraries(vkcube ${CMAKE_DL_LIBS} Vulkan::Headers)
+ if (ANDROID)
+     install(TARGETS vkcube DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ elseif(APPLE)
+-    install(
+-        TARGETS vkcube
+-        # Install runtime dependencies like the Vulkan::Loader so the app is self-contained
+-        RUNTIME_DEPENDENCIES DESTINATION "cube/vkcube.app/Contents/Frameworks/"
+-        BUNDLE DESTINATION "cube"
+-    )
++    install(TARGETS vkcube BUNDLE DESTINATION "cube")
+     set_target_properties(vkcube PROPERTIES
+         INSTALL_RPATH @executable_path/../Frameworks
+     )
+@@ -351,12 +352,7 @@ target_compile_definitions(vkcubepp PRIVATE ${ENABLED_CUBE_PLATFORMS})
+ target_link_libraries(vkcubepp ${CMAKE_DL_LIBS} Vulkan::Headers)
+ 
+ if(APPLE)
+-    install(
+-        TARGETS vkcubepp
+-        # Install runtime dependencies like the Vulkan::Loader so the app is self-contained
+-        RUNTIME_DEPENDENCIES DESTINATION "cube/vkcubepp.app/Contents/Frameworks/"
+-        BUNDLE DESTINATION "cube"
+-    )
++    install(TARGETS vkcubepp BUNDLE DESTINATION "cube")
+     set_target_properties(vkcubepp PROPERTIES
+         INSTALL_RPATH @executable_path/../Frameworks
+     )
+diff --git a/cube/macOS/cube/CMakeLists.txt b/cube/macOS/cube/CMakeLists.txt
+index 3300d6b..d0721a8 100644
+--- a/cube/macOS/cube/CMakeLists.txt
++++ b/cube/macOS/cube/CMakeLists.txt
+@@ -17,8 +17,10 @@
+ 
+ # VkCube Application Bundle
+ 
+-set(cube_RESOURCES ${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json
+-    ${CMAKE_CURRENT_LIST_DIR}/Resources/VulkanIcon.icns)
++set(cube_RESOURCES ${CMAKE_CURRENT_LIST_DIR}/Resources/VulkanIcon.icns)
++if(NOT APPLE_USE_SYSTEM_ICD)
++    list(APPEND cube_RESOURCES ${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json)
++endif()
+ 
+ # Have Xcode handle the Storyboard
+ if(XCODE)
+@@ -52,7 +54,9 @@ if(NOT XCODE)
+                        COMMENT "Compiling storyboard")
+ endif()
+ 
+-add_dependencies(vkcube MoltenVK_icd-staging-json)
++if(NOT APPLE_USE_SYSTEM_ICD)
++    add_dependencies(vkcube MoltenVK_icd-staging-json)
++endif()
+ 
+ # Include demo source code dir because the MacOS cube's Objective-C source includes the "original" cube application C source code.
+ target_include_directories(vkcube PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+@@ -70,18 +74,20 @@ set_target_properties(vkcube PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT
+ # directory basis. If all the files went into the top-level Resource directory, then we could simply set the RESOURCE property to a
+ # list of all the resource files.
+ set_source_files_properties(${cube_RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+-set_source_files_properties("${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json"
+-                            PROPERTIES
+-                            MACOSX_PACKAGE_LOCATION
+-                            "Resources/vulkan/icd.d")
++if(NOT APPLE_USE_SYSTEM_ICD)
++    set_source_files_properties("${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json"
++                                PROPERTIES
++                                MACOSX_PACKAGE_LOCATION
++                                "Resources/vulkan/icd.d")
+ 
+-# Copy the MoltenVK lib into the bundle.
+-if(XCODE)
+-    add_custom_command(TARGET vkcube POST_BUILD
+-                       COMMAND ${CMAKE_COMMAND} -E copy "${MOLTENVK_DIR}/Package/Release/MoltenVK/dynamic/dylib/macOS/libMoltenVK.dylib"
+-                               ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/vkcube.app/Contents/Frameworks/libMoltenVK.dylib)
+-else()
+-    add_custom_command(TARGET vkcube POST_BUILD
+-                       COMMAND ${CMAKE_COMMAND} -E copy "${MOLTENVK_DIR}/Package/Release/MoltenVK/dynamic/dylib/macOS/libMoltenVK.dylib"
+-                               ${CMAKE_CURRENT_BINARY_DIR}/vkcube.app/Contents/Frameworks/libMoltenVK.dylib)
++    # Copy the MoltenVK lib into the bundle.
++    if(XCODE)
++        add_custom_command(TARGET vkcube POST_BUILD
++                           COMMAND ${CMAKE_COMMAND} -E copy "${MOLTENVK_DIR}/Package/Release/MoltenVK/dynamic/dylib/macOS/libMoltenVK.dylib"
++                                   ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/vkcube.app/Contents/Frameworks/libMoltenVK.dylib)
++    else()
++        add_custom_command(TARGET vkcube POST_BUILD
++                           COMMAND ${CMAKE_COMMAND} -E copy "${MOLTENVK_DIR}/Package/Release/MoltenVK/dynamic/dylib/macOS/libMoltenVK.dylib"
++                                   ${CMAKE_CURRENT_BINARY_DIR}/vkcube.app/Contents/Frameworks/libMoltenVK.dylib)
++    endif()
+ endif()
+diff --git a/cube/macOS/cubepp/CMakeLists.txt b/cube/macOS/cubepp/CMakeLists.txt
+index cf05165..6390db0 100644
+--- a/cube/macOS/cubepp/CMakeLists.txt
++++ b/cube/macOS/cubepp/CMakeLists.txt
+@@ -17,8 +17,10 @@
+ 
+ # VkCube Application Bundle
+ 
+-set(cubepp_RESOURCES ${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json
+-    ${CMAKE_CURRENT_LIST_DIR}/Resources/VulkanIcon.icns)
++set(cubepp_RESOURCES ${CMAKE_CURRENT_LIST_DIR}/Resources/VulkanIcon.icns)
++if(NOT APPLE_USE_SYSTEM_ICD)
++    list(APPEND cubepp_RESOURCES ${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json)
++endif()
+ 
+ # Have Xcode handle the Storyboard
+ if(XCODE)
+@@ -52,7 +54,9 @@ if(NOT XCODE)
+                        COMMENT "Compiling storyboard")
+ endif()
+ 
+-add_dependencies(vkcubepp MoltenVK_icd-staging-json)
++if(NOT APPLE_USE_SYSTEM_ICD)
++    add_dependencies(vkcubepp MoltenVK_icd-staging-json)
++endif()
+ 
+ # Include demo source code dir because the MacOS vkcubepp's Objective-C source includes the "original" vkcubepp application C++ source
+ # code.
+@@ -68,18 +72,20 @@ set_target_properties(vkcubepp PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRE
+ # directory basis. If all the files went into the top-level Resource directory, then we could simply set the RESOURCE property to a
+ # list of all the resource files.
+ set_source_files_properties(${cubepp_RESOURCES} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+-set_source_files_properties("${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json"
+-                            PROPERTIES
+-                            MACOSX_PACKAGE_LOCATION
+-                            "Resources/vulkan/icd.d")
++if(NOT APPLE_USE_SYSTEM_ICD)
++    set_source_files_properties("${PROJECT_BINARY_DIR}/staging-json/MoltenVK_icd.json"
++                                PROPERTIES
++                                MACOSX_PACKAGE_LOCATION
++                                "Resources/vulkan/icd.d")
+ 
+-# Copy the MoltenVK lib into the bundle.
+-if(XCODE)
+-    add_custom_command(TARGET vkcubepp POST_BUILD
+-                       COMMAND ${CMAKE_COMMAND} -E copy "${MOLTENVK_DIR}/Package/Release/MoltenVK/dynamic/dylib/macOS/libMoltenVK.dylib"
+-                               ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/vkcubepp.app/Contents/Frameworks/libMoltenVK.dylib)
+-else()
+-    add_custom_command(TARGET vkcubepp POST_BUILD
+-                       COMMAND ${CMAKE_COMMAND} -E copy "${MOLTENVK_DIR}/Package/Release/MoltenVK/dynamic/dylib/macOS/libMoltenVK.dylib"
+-                               ${CMAKE_CURRENT_BINARY_DIR}/vkcubepp.app/Contents/Frameworks/libMoltenVK.dylib)
++    # Copy the MoltenVK lib into the bundle.
++    if(XCODE)
++        add_custom_command(TARGET vkcubepp POST_BUILD
++                           COMMAND ${CMAKE_COMMAND} -E copy "${MOLTENVK_DIR}/Package/Release/MoltenVK/dynamic/dylib/macOS/libMoltenVK.dylib"
++                                   ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/vkcubepp.app/Contents/Frameworks/libMoltenVK.dylib)
++    else()
++        add_custom_command(TARGET vkcubepp POST_BUILD
++                           COMMAND ${CMAKE_COMMAND} -E copy "${MOLTENVK_DIR}/Package/Release/MoltenVK/dynamic/dylib/macOS/libMoltenVK.dylib"
++                                   ${CMAKE_CURRENT_BINARY_DIR}/vkcubepp.app/Contents/Frameworks/libMoltenVK.dylib)
++    endif()
+ endif()
