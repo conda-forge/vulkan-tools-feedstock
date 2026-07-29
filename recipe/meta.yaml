@@ -10,8 +10,6 @@ package:
 source:
   url: https://github.com/KhronosGroup/Vulkan-Tools/archive/refs/tags/vulkan-sdk-{{ version }}.tar.gz
   sha256: 6c94b86c850808aba316d999dd6742133d6197ae2135248d3a8aed9b32ebd1f7
-  patches:
-    - use-system-icd.patch  # [osx]
 
 build:
   number: 0
