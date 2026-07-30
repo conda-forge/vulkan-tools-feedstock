@@ -1,0 +1,30 @@
+--- a/cube/CMakeLists.txt
++++ b/cube/CMakeLists.txt
+@@ -296,12 +296,7 @@
+ if (ANDROID)
+     install(TARGETS vkcube DESTINATION ${CMAKE_INSTALL_LIBDIR})
+ elseif(APPLE)
+-    install(
+-        TARGETS vkcube
+-        # Install runtime dependencies like the Vulkan::Loader so the app is self-contained
+-        RUNTIME_DEPENDENCIES DESTINATION "cube/vkcube.app/Contents/Frameworks/"
+-        BUNDLE DESTINATION "cube"
+-    )
++    install(TARGETS vkcube BUNDLE DESTINATION "cube")
+     set_target_properties(vkcube PROPERTIES
+         INSTALL_RPATH @executable_path/../Frameworks
+     )
+@@ -357,12 +352,7 @@
+ target_link_libraries(vkcubepp ${CMAKE_DL_LIBS} Vulkan::Headers)
+ 
+ if(APPLE)
+-    install(
+-        TARGETS vkcubepp
+-        # Install runtime dependencies like the Vulkan::Loader so the app is self-contained
+-        RUNTIME_DEPENDENCIES DESTINATION "cube/vkcubepp.app/Contents/Frameworks/"
+-        BUNDLE DESTINATION "cube"
+-    )
++    install(TARGETS vkcubepp BUNDLE DESTINATION "cube")
+     set_target_properties(vkcubepp PROPERTIES
+         INSTALL_RPATH @executable_path/../Frameworks
+     )
